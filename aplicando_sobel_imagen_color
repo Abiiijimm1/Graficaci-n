@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Sobel de color</title>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <canvas id="resultado"></canvas>
+
+    <script type="text/javascript">
+
+        var image = new Image();
+        image.onload = imageLoaded;
+        image.src = "don-gato-y-su-pandilla-1.png"
+
+        function imageLoaded(){
+
+            var canvas = document.getElementById("canvas");
+            var ctx = canvas.getContext("2d");
+
+            canvas.width = image.width;
+            canvas.height = image.height;
+
+            ctx.drawImage(image, 0, 0, image.width, image.height);
+
+            convolucionar(canvas);
+
+        }
+
+        function convolucionar(canvas){
+
+            var ctx = canvas.getContext("2d");
+            var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            var pixeles = imgData.data;
+
+            var resultado = document.getElementById("resultado");
+            resultado.width = canvas.width;
+            resultado.height = canvas.height;
+            var ctxResultado = resultado.getContext("2d");
+            var imgDataResultado = ctxResultado.getImageData(0, 0, resultado.width, resultado.height);
+            var pixelesResultado = imgDataResultado.data;
+
+            var sobelVertical = [
+                [-1, 1, -1],
+                [-2, 0, 2],
+                [1, 0, 1],
+            ];
+
+            var sobelHorizontal = [
+                [-1, -2, -1],
+                [0, 0, 0],
+                [1, 2, 1],
+            ];
+
+            for (var y = 1; y < canvas.height - 1; y++){
+                for (var x = 1; x < canvas.width - 1; x++){
+                    var idx = ((y * canvas.width) + x) * 4;
+
+                    var totalRV = [0, 0, 0]; // Total de valores de Rojo, Verde y Azul
+
+                    for( var kernelY = 0; kernelY < 3; kernelY++){
+                        for( var kernelX = 0; kernelX < 3; kernelX++){
+
+                            var pixelX = x + (kernelX - 1);
+                            var pixelY = y + (kernelY - 1);
+                            var idxKernel = ((pixelY * canvas.width) + pixelX) * 4;
+
+                            // Aplicar el kernel Sobel a cada canal de color (Rojo, Verde, Azul)
+                            for (var c = 0; c < 3; c++) {
+                                totalRV[c] += sobelVertical[kernelY][kernelX] * pixeles[idxKernel + c];
+                                totalRV[c] += sobelHorizontal[kernelY][kernelX] * pixeles[idxKernel + c];
+                            }
+                        }
+                    }
+
+                    // Establecer los valores de píxeles en el lienzo de resultado
+                    for (var c = 0; c < 3; c++) {
+                        pixelesResultado[idx + c] = Math.abs(totalRV[c]);
+                    }
+
+                    pixelesResultado[idx + 3] = 255; // Canal alfa
+
+                }
+            }
+
+            ctxResultado.putImageData(imgDataResultado, 0, 0);
+
+        }
+    </script>
+</body>
+</html>
