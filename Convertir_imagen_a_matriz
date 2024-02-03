@@ -1,0 +1,28 @@
+El código fue relacionado con python
+
+import cv2
+import numpy as np
+
+# Ruta de la imagen JPG
+imagen_jpg = 'box1.jpg'
+
+# Cargar la imagen en una matriz
+imagen_matriz = cv2.imread(imagen_jpg)
+
+if imagen_matriz is not None:
+    # Guardar la matriz en una nueva imagen JPG (para convertir de nuevo)
+    cv2.imwrite('imagen_convertida.jpg', imagen_matriz)
+    
+    # Mostrar la matriz (opcional)
+    print("Matriz de la imagen:")
+    print(imagen_matriz)
+
+    # Mostrar la imagen (opcional)
+    cv2.imshow('Imagen convertida', imagen_matriz)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+else:
+    print("No se pudo cargar la imagen.")
+
+# Convertir la matriz de nuevo a una imagen
+cv2.imwrite('imagen_recuperada.jpg', imagen_matriz)
